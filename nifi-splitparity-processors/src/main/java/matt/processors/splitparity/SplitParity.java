@@ -37,11 +37,7 @@ import org.apache.nifi.processor.util.StandardValidators;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Tags({"split"})
 @CapabilityDescription("Split a file into data fragments and error correction parity files.")
@@ -160,13 +156,15 @@ public class SplitParity extends AbstractProcessor {
         reedSolomon.encodeParity(shards, 0, shardSize);
 
         // Send the resulting parts as flow files
+        final String fragmentId = UUID.randomUUID().toString();
         final List<FlowFile> parts = new ArrayList<>();
         for (Integer i = 0; i < totalShards; i++) {
             FlowFile part = session.create(originalFlowFile);
             final int idx = i;
             part = session.write(part, out -> out.write(shards[idx]));
             part = session.putAttribute(part,"filename", originalFlowFile.getAttribute("filename") + "." + i.toString());
-            part = session.putAttribute(part, "fragment.index", i.toString());
+            part = session.putAttribute(part, "fragment.index", fragmentId);
+            part = session.putAttribute(part, "fragment.identifier", i.toString());
             part = session.putAttribute(part, "segment.original.filename", originalFlowFile.getAttribute("filename"));
             part = session.putAttribute(part, "fragment.count", Integer.toString(dataShards + parityShards));
             parts.add(part);
