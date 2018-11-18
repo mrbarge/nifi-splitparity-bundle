@@ -23,9 +23,9 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.behavior.WritesAttributes;
-import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
+import org.apache.nifi.flowfile.attributes.FragmentAttributes;
 import org.apache.nifi.logging.ComponentLog;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.AbstractProcessor;
@@ -47,6 +47,12 @@ import java.util.*;
         @WritesAttribute(attribute = "fragment.count", description = "The number of split FlowFiles generated from the parent FlowFile"),
         @WritesAttribute(attribute = "segment.original.filename", description = "The filename of the parent FlowFile")})
 public class SplitParity extends AbstractProcessor {
+
+    // attribute keys
+    public static final String FRAGMENT_ID = FragmentAttributes.FRAGMENT_ID.key();
+    public static final String FRAGMENT_INDEX = FragmentAttributes.FRAGMENT_INDEX.key();
+    public static final String FRAGMENT_COUNT = FragmentAttributes.FRAGMENT_COUNT.key();
+    public static final String SEGMENT_ORIGINAL_FILENAME = FragmentAttributes.SEGMENT_ORIGINAL_FILENAME.key();
 
     public static final PropertyDescriptor SHARD_SIZE = new PropertyDescriptor
             .Builder().name("SHARD_SIZE")
@@ -163,10 +169,10 @@ public class SplitParity extends AbstractProcessor {
             final int idx = i;
             part = session.write(part, out -> out.write(shards[idx]));
             part = session.putAttribute(part,"filename", originalFlowFile.getAttribute("filename") + "." + i.toString());
-            part = session.putAttribute(part, "fragment.index", fragmentId);
-            part = session.putAttribute(part, "fragment.identifier", i.toString());
-            part = session.putAttribute(part, "segment.original.filename", originalFlowFile.getAttribute("filename"));
-            part = session.putAttribute(part, "fragment.count", Integer.toString(dataShards + parityShards));
+            part = session.putAttribute(part, FRAGMENT_INDEX, fragmentId);
+            part = session.putAttribute(part, FRAGMENT_ID, i.toString());
+            part = session.putAttribute(part, SEGMENT_ORIGINAL_FILENAME, originalFlowFile.getAttribute("filename"));
+            part = session.putAttribute(part, FRAGMENT_COUNT, Integer.toString(dataShards + parityShards));
             parts.add(part);
         }
 
