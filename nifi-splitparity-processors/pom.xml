@@ -26,7 +26,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <backblaze.reedsolomon.home>D:/workspace/JavaReedSolomon</backblaze.reedsolomon.home>
+      <backblaze.reedsolomon.home>${project.basedir}/thirdparty/JavaReedSolomon</backblaze.reedsolomon.home>
     </properties>
 
 
@@ -38,21 +38,19 @@
         <dependency>
             <groupId>org.apache.nifi</groupId>
             <artifactId>nifi-utils</artifactId>
-            <version>1.8.0</version>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>com.backblaze</groupId>
             <artifactId>JavaReedSolomon</artifactId>
             <version>1.0</version>
-<!--
             <scope>system</scope>
-            <systemPath>${backblaze.reedsolomon.home}/build/libs/JavaReedSolomon.jar</systemPath>
--->
+            <systemPath>${backblaze.reedsolomon.home}/JavaReedSolomon.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.apache.nifi</groupId>
             <artifactId>nifi-mock</artifactId>
-            <version>1.8.0</version>
+            <version>1.9.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -67,10 +65,4 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>my</id>
-            <url>file:///D|/workspace/local-repo</url>
-        </repository>
-    </repositories>
 </project>
