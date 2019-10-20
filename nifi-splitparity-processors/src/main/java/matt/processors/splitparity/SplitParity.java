@@ -169,8 +169,8 @@ public class SplitParity extends AbstractProcessor {
             final int idx = i;
             part = session.write(part, out -> out.write(shards[idx]));
             part = session.putAttribute(part,"filename", originalFlowFile.getAttribute("filename") + "." + i.toString());
-            part = session.putAttribute(part, FRAGMENT_INDEX, fragmentId);
-            part = session.putAttribute(part, FRAGMENT_ID, i.toString());
+            part = session.putAttribute(part, FRAGMENT_ID, fragmentId);
+            part = session.putAttribute(part, FRAGMENT_INDEX, i.toString());
             part = session.putAttribute(part, SEGMENT_ORIGINAL_FILENAME, originalFlowFile.getAttribute("filename"));
             part = session.putAttribute(part, FRAGMENT_COUNT, Integer.toString(dataShards + parityShards));
             parts.add(part);
