@@ -25,6 +25,7 @@ import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
+import org.apache.nifi.flowfile.attributes.FlowFileAttributeKey;
 import org.apache.nifi.flowfile.attributes.FragmentAttributes;
 import org.apache.nifi.logging.ComponentLog;
 import org.apache.nifi.processor.exception.ProcessException;
@@ -45,7 +46,11 @@ import java.util.*;
         @WritesAttribute(attribute = "fragment.identifier", description = "All split FlowFiles produced from the same parent FlowFile will have the same randomly generated UUID added for this attribute"),
         @WritesAttribute(attribute = "fragment.index", description = "A one-up number that indicates the ordering of the split FlowFiles that were created from a single parent FlowFile"),
         @WritesAttribute(attribute = "fragment.count", description = "The number of split FlowFiles generated from the parent FlowFile"),
-        @WritesAttribute(attribute = "segment.original.filename", description = "The filename of the parent FlowFile")})
+        @WritesAttribute(attribute = "segment.original.filename", description = "The filename of the parent FlowFile"),
+        @WritesAttribute(attribute = "fragment.data.count", description = "The number of data shards produced."),
+        @WritesAttribute(attribute = "fragment.parity.count", description = "The number of parity shards produced."),
+})
+
 public class SplitParity extends AbstractProcessor {
 
     // attribute keys
@@ -53,6 +58,9 @@ public class SplitParity extends AbstractProcessor {
     public static final String FRAGMENT_INDEX = FragmentAttributes.FRAGMENT_INDEX.key();
     public static final String FRAGMENT_COUNT = FragmentAttributes.FRAGMENT_COUNT.key();
     public static final String SEGMENT_ORIGINAL_FILENAME = FragmentAttributes.SEGMENT_ORIGINAL_FILENAME.key();
+
+    public static final String FRAGMENT_DATA_COUNT = "fragment.data.count";
+    public static final String FRAGMENT_PARITY_COUNT = "fragment.parity.count";
 
     public static final PropertyDescriptor SHARD_SIZE = new PropertyDescriptor
             .Builder().name("SHARD_SIZE")
@@ -173,6 +181,8 @@ public class SplitParity extends AbstractProcessor {
             part = session.putAttribute(part, FRAGMENT_INDEX, i.toString());
             part = session.putAttribute(part, SEGMENT_ORIGINAL_FILENAME, originalFlowFile.getAttribute("filename"));
             part = session.putAttribute(part, FRAGMENT_COUNT, Integer.toString(dataShards + parityShards));
+            part = session.putAttribute(part, FRAGMENT_DATA_COUNT, Integer.toString(dataShards));
+            part = session.putAttribute(part, FRAGMENT_PARITY_COUNT, Integer.toString(parityShards));
             parts.add(part);
         }
 
